@@ -92,15 +92,25 @@ class Geolib {
         /**
          * NOTE:
          * To minimize number of API requests,
-         * we're saving the IP data in cookies
+         * we're saving the IP data in the session storage
          * Whenever we make an API request for this current user
-         * we're going to save the result in a cookie that will expire in 6 hours
-         * a reasonable time, that we don't expect the user's IP to change within.
+         * we're going to save the result in a the session.
+         * So when this method is called again the IP data
+         * will show up.
+         * 
         **/
-        if($ip===null) if($ci->input->cookie("IP_DATA")!== null) return unserialize(base64_decode(urldecode($ci->input->cookie("IP_DATA"))));
+        if($ip===null) {
+            if($ci->input->cookie("IP_DATA")!== null) {
+                if(session_id() == '') session_start();
+                return unserialize(base64_decode(urldecode($_SESSION["IP_DATA"])));
+            }
+        }
         $gP = new geoPlugin();
         $data = $gP->locate($ip);
-        if($ip===null) setcookie("IP_DATA",urlencode(base64_encode(serialize($data))),time()+60*60*6); // valid for the next 5 hours
+        if($ip===null) {
+            if(session_id() == '') session_start();
+            $_SESION["IP_DATA"] = urlencode(base64_encode(serialize($data))); // valid for the next 5 hours
+        }
         return $data;
         /**
          * 
