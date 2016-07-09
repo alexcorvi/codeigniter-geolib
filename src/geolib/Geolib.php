@@ -100,8 +100,8 @@ class Geolib {
          * 
         **/
         if($ip===null) {
-            if($ci->input->cookie("IP_DATA")!== null) {
-                if(session_id() == '') session_start();
+            if(session_id() == '') session_start();
+            if(isset($_SESSION["IP_DATA"])) {
                 return unserialize(base64_decode(urldecode($_SESSION["IP_DATA"])));
             }
         }
